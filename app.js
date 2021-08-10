@@ -3,12 +3,16 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+const {models, sequelize} = require("./models");
+const routes = require("./routes");
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
 
 // create the Express app
 const app = express();
+
+app.use(express.json());
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
@@ -19,6 +23,9 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
+
+
+app.use("/api", routes);
 
 // send 404 if no other route matched
 app.use((req, res) => {
@@ -41,6 +48,17 @@ app.use((err, req, res, next) => {
 
 // set our port
 app.set('port', process.env.PORT || 5000);
+
+// Authenticate database connection
+
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("Connection to database successful!");
+  } catch (err) {
+    console.log("Connection to database was unsuccessful", err);
+  }
+})();
 
 // start listening on our port
 const server = app.listen(app.get('port'), () => {
