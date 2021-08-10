@@ -4,12 +4,23 @@ const router = express.Router();
 // Get references to the models.
 const { User, Course } = require("./models");
 
-router.get("/users", (req, res) => {
-   res.send("Just a test");
+router.get("/users",async (req, res) => {
+    const users = await User.findAll();
+    res.json(users);
 });
 
-router.post("/users", (req, res) => {
-    res.send("Just a test");
+router.post("/users",async (req, res) => {
+    try {
+        const user = await User.create({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            emailAddress: req.body.emailAddress,
+            password: req.body.password
+        });
+        res.status(201).location("/");
+    } catch (err) {
+        res.status(400).json({message: "Sorry, bad request"});
+    }
 });
 
 router.get("/courses", async (req, res) => {
@@ -40,12 +51,9 @@ router.get("/courses/:id",async (req, res) => {
 
 router.post("/courses",async (req, res) => {
     try{
-            const course = await Course.create({
-                title: req.body.title,
-                description: req.body.description,
-                estimatedTime: req.body.estimatedTime,
-                materialsNeeded: req.body.materialsNeeded
-            });
+        if (req.body.title && req.body.description) {
+            const course = await Course.create(req.body);
+        }
     } catch (err) {
         res.status(400).json({message: "Sorry, bad request"});
     }
