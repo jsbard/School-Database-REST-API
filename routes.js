@@ -39,7 +39,7 @@ router.post("/users", async (req, res) => {
                     }
                 } catch (err) {
                     if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
-                        const sequelizeValidationError = err.errors.map(err => err.message);
+                        const sequelizeValidationError = err.errors.map(err => "Please provide a unique, properly formatted email address");
                         res.status(400).json({ sequelizeValidationError });
                     } else {
                         console.log(err);
